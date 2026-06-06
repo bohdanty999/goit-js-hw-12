@@ -7,11 +7,20 @@ import {
   clearGallery,
   showLoader,
   hideLoader,
+  showLoadMore,
+  hideLoadMore,
 } from './js/render-functions';
 
 const form = document.querySelector('.form');
+const loadMoreBtn = document.querySelector('.load-more');
 
-form.addEventListener('submit', e => {
+let currentQuery = '';
+let currentPage = 1;
+let totalHits = 0;
+
+hideLoadMore();
+
+form.addEventListener('submit', async e => {
   e.preventDefault();
 
   const query = form.querySelector('[name="search-text"]').value.trim();
@@ -21,25 +30,61 @@ form.addEventListener('submit', e => {
     return;
   }
 
+  currentQuery = query;
+  currentPage = 1;
+  totalHits = 0;
+
   clearGallery();
+  hideLoadMore();
   showLoader();
 
-  getImagesByQuery(query)
-    .then(data => {
-      hideLoader();
+  try {
+    const data = await getImagesByQuery(currentQuery, currentPage);
+    hideLoader();
 
-      if (data.hits.length === 0) {
-        iziToast.error({
-          message:
-            'Sorry, there are no images matching your search query. Please try again!',
-        });
-        return;
-      }
+    if (data.hits.length === 0) {
+      iziToast.error({
+        message:
+          'Sorry, there are no images matching your search query. Please try again!',
+      });
+      return;
+    }
 
-      createGallery(data.hits);
-    })
-    .catch(() => {
-      hideLoader();
-      iziToast.error({ message: 'Something went wrong. Please try again.' });
-    });
+    totalHits = data.totalHits;
+    createGallery(data.hits);
+    updateLoadMore();
+  } catch {
+    hideLoader();
+    iziToast.error({ message: 'Something went wrong. Please try again.' });
+  }
 });
+
+loadMoreBtn.addEventListener('click', async () => {
+  currentPage += 1;
+  showLoader();
+
+  try {
+    const data = await getImagesByQuery(currentQuery, currentPage);
+    hideLoader();
+
+    createGallery(data.hits);
+
+    updateLoadMore();
+  } catch {
+    hideLoader();
+    iziToast.error({ message: 'Something went wrong. Please try again.' });
+  }
+});
+
+function updateLoadMore() {
+  const loadedSoFar = currentPage * 15;
+
+  if (loadedSoFar >= totalHits) {
+    hideLoadMore();
+    iziToast.info({
+      message: "We're sorry, but you've reached the end of search results.",
+    });
+  } else {
+    showLoadMore();
+  }
+}

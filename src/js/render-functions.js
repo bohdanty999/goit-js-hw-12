@@ -3,6 +3,7 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const gallery = document.querySelector('.gallery');
 const loader = document.querySelector('.loader');
+const loadMoreBtn = document.querySelector('.load-more');
 
 const lightbox = new SimpleLightbox('.gallery a', {});
 
@@ -41,4 +42,30 @@ export function showLoader() {
 
 export function hideLoader() {
   loader.classList.remove('loader--visible');
+}
+
+export function showLoadMore() {
+  loadMoreBtn.classList.remove('load-more--hidden');
+}
+
+export function hideLoadMore() {
+  loadMoreBtn.classList.add('load-more--hidden');
+}
+
+export function scrollAfterLoad() {
+  const firstCard = document.querySelector('.gallery-item');
+  if (!firstCard) return;
+}
+
+export function updateLoadMore() {
+  const loadedSoFar = currentPage * 15;
+
+  if (loadedSoFar >= totalHits) {
+    hideLoadMore();
+    iziToast.info({
+      message: "We're sorry, but you've reached the end of search results.",
+    });
+  } else {
+    showLoadMore();
+  }
 }
