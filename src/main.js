@@ -61,6 +61,7 @@ form.addEventListener('submit', async e => {
 
 loadMoreBtn.addEventListener('click', async () => {
   currentPage += 1;
+  hideLoadMore();
   showLoader();
 
   try {
@@ -68,6 +69,11 @@ loadMoreBtn.addEventListener('click', async () => {
     hideLoader();
 
     createGallery(data.hits);
+
+    const cardHeight = document
+      .querySelector('.gallery-item')
+      .getBoundingClientRect().height;
+    window.scrollBy({ top: cardHeight * 2, behavior: 'smooth' });
 
     updateLoadMore();
   } catch {

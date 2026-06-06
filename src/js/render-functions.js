@@ -51,21 +51,3 @@ export function showLoadMore() {
 export function hideLoadMore() {
   loadMoreBtn.classList.add('load-more--hidden');
 }
-
-export function scrollAfterLoad() {
-  const firstCard = document.querySelector('.gallery-item');
-  if (!firstCard) return;
-}
-
-export function updateLoadMore() {
-  const loadedSoFar = currentPage * 15;
-
-  if (loadedSoFar >= totalHits) {
-    hideLoadMore();
-    iziToast.info({
-      message: "We're sorry, but you've reached the end of search results.",
-    });
-  } else {
-    showLoadMore();
-  }
-}
